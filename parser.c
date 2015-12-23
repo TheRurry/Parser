@@ -5,10 +5,10 @@
 int Fsize=50;
 
 //returns a substring, of the entered string
-char *substr(char *g, int str, int end) {
-  char* temp = malloc(end-str+2); //+1 for null char
-  strncpy(temp, g+str, end-str+1);
-  temp[end-str+1] = 0;
+char *substr(char *g, int start, int end) {
+  char* temp = malloc(end-start+2); //+1 for null char
+  strncpy(temp, g+start, end-start+1);
+  temp[end-start+1] = 0;
   return temp;
 }
 
