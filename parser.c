@@ -6,10 +6,7 @@ int Fsize=50;
 
 //returns a substring, of the entered string
 char *substr(char *g, int str, int end) {
-  char* temp = malloc(end-str+2); //+1 for null char
-  strncpy(temp, g+str, end-str+1);
-  temp[end-str+1] = 0;
-  return temp;
+  return g;
 }
 
 //check if a character is a variable
@@ -22,13 +19,6 @@ int varCheck(char g) {
 //check if fmla is a valid atomic formula
 int atom(char *g) {
   if (strlen(g) == 5 && *(g+1) == '[' && *(g+4) == ']' && varCheck(*(g+2)) && varCheck(*(g+3)))
-    return 1;
-  return 0;
-}
-
-//check if a character is a binary connector
-int binCheck(char g) {
-  if (g == '^' || g == 'v' || g == '>')
     return 1;
   return 0;
 }
