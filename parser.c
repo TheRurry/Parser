@@ -21,7 +21,7 @@ int varCheck(char g) {
 
 //check if fmla is a valid atomic formula
 int atom(char *g) {
-  if (*(g+1) == '[' && *(g+4) == ']' && varCheck(*(g+2)) && varCheck(*(g+3)) && /*strlen(g) == 5*/ 1)
+  if (strlen(g) == 5 && *(g+1) == '[' && *(g+4) == ']' && varCheck(*(g+2)) && varCheck(*(g+3)))
     return 1;
   return 0;
 }
