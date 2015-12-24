@@ -87,20 +87,33 @@ int parse(char *g) {
 
 int eval();
 
-//Checks to see if an atomic fmla will evaluate tree
+//Checks to see if an atomic fmla will evaluate true
 int checkAtom(char *nm, int edges[no_edges][2], int V[3]) {
-  int var1 = 0, var2 = 0, i;
+  int i, var1 = 0, var2 = 0;
+
+  //variable assignments
   for (i = 0; i < 3; i++) {
     if (*(nm+2) == 'x' + i)
       var1 = V[i];
     if (*(nm+3) == 'x' + i)
       var2 = V[i];
   }
+
+  //assignments to edge comparisons
   for (i = 0; i < no_edges; i++) {
     if (var1 == edges[i][0] && var2 == edges[i][1])
       return 1;
   }
+
   return 0;
+}
+
+int checkExi(char *nm, int edges[no_edges][2], int size, int V[3]) {
+
+}
+
+int checkUni(char *nm, int edges[no_edges][2], int size, int V[3]) {
+
 }
 
 int checkBin(char *nm, int edges[no_edges][2], int size, int V[3]) {
@@ -123,10 +136,11 @@ int eval(char *nm, int edges[no_edges][2], int size, int V[3]) {
     case 1: return checkAtom(nm, edges, V);
     case 2: return !eval(substr(nm, 1, strlen(nm) - 1), edges, size, V);
     case 3: return checkBin(nm, edges, size, V);
+    case 4: return checkExi(nm, edges, size, V);
+    case 5: return checkUni(nm, edges, size, V);
     default: return 0; break;
 	}
 }
-
 
 int main()
 {
