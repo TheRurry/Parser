@@ -118,14 +118,13 @@ int checkUni(char *nm, int edges[no_edges][2], int size, int V[3]) {
 
 int checkBin(char *nm, int edges[no_edges][2], int size, int V[3]) {
   int binPos = findBin(nm);
-  char binConn = *(nm + binPos);
   int lFmla = eval(substr(nm, 1, binPos-1), edges, size, V);
   int rFmla = eval(substr(nm, binPos+1, strlen(nm)-2), edges, size, V);
-  if (binConn == 'v' && (lFmla && rFmla))
+  if (*(nm + binPos) == 'v' && (lFmla && rFmla))
     return 1;
-  if (binConn == '^' && (lFmla || rFmla))
+  if (*(nm + binPos) == '^' && (lFmla || rFmla))
     return 1;
-  if (binConn == '>' && !(lFmla && !rFmla))
+  if (*(nm + binPos) == '>' && !(lFmla && !rFmla))
     return 1;
   return 0;
 }
