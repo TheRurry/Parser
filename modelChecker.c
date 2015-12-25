@@ -88,38 +88,133 @@ int parse(char *g) {
 int eval();
 
 //Checks to see if an atomic fmla will evaluate true
-int checkAtom(char *nm, int edges[no_edges][2], int V[3]) {
-  int i, var1 = 0, var2 = 0;
+int checkAtom(char *nm, int edges[no_edges][2], int V[3], fst, snd) {
+  int i, j, var1 = 0, var2 = 0, check1 = 0, check2 = 0;
+  char one, two; //stores character of var1 and var2
 
   //variable assignments
   for (i = 0; i < 3; i++) {
     if (*(nm+2) == 'x' + i)
       var1 = V[i];
+      one = 'x' + i;
     if (*(nm+3) == 'x' + i)
       var2 = V[i];
+      two = 'x' + i
   }
 
-  //assignments to edge comparisons
+  //choose the appropriate for loop(s) depending on fst and snd
+  
+
+  //Avar1Evar2[var1var2]
+  for (k = 0; k < size; k++) {
+    int temp = 0;
+    for (j = 0; j < size; j++) {
+      for (i = 0; i < no_edges; i++) {
+        if (!temp)
+          temp = temp || (k == edges[i][0] && j == edges[i][1]);
+      }
+    }
+    if (!temp)
+      return 0;
+  } //return 1;
+
+  //Evar1Avar2[var1var2]
+  for (k = 0; k < size; k++) {
+    int temp = 1;
+    for (j = 0; j < size; j++) {
+      for (i = 0; i < no_edges; i++) {
+        temp = temp && (k == edges[i][0] && j == edges[i][1]);
+      }
+    }
+    if (temp)
+      return 1;
+  } //return 0;
+
+  //Avar1[var1var2]
+  for (j = 0; j < size; j++) {
+    for (i = 0; i < no_edges; i++) {
+      if (!(j == edges[i][0] && var2 == edges[i][1]))
+        return 0;
+    }
+  } //return 1;
+
+  //Avar2[var1var2]
+  for (j = 0; j < size; j++) {
+    for (i = 0; i < no_edges; i++) {
+      if (!(var1 == edges[i][0] && j == edges[i][1]))
+        return 0;
+    }
+  } //return 1;
+
+  //Avar1Avar2[var1var2]
+  for (j = 0; j < size; j++) {
+    for (i = 0; i < no_edges; i++) {
+      if (!(j == edges[i][0] && j == edges[i][1]))
+        return 0;
+    }
+  } //return 1;
+
+  //Evar1[var1var2]
+  for (j = 0; j < size; j++) {
+    for (i = 0; i < no_edges; i++) {
+      if (j == edges[i][0] && var2 == edges[i][1])
+        return 1;
+    }
+  } //return 0;
+
+  //Evar2[var1var2]
+  for (j = 0; j < size; j++) {
+    for (i = 0; i < no_edges; i++) {
+      if (var1 == edges[i][0] && j == edges[i][1])
+        return 1;
+    }
+  } //return 0;
+
+  //Evar1Evar2[var1var2]
+  for (j = 0; j < size; j++) {
+    for (i = 0; i < no_edges; i++) {
+      if (j == edges[i][0] && j == edges[i][1])
+        return 1;
+    }
+  } //return 0;
+
+  //no quantifiers
   for (i = 0; i < no_edges; i++) {
     if (var1 == edges[i][0] && var2 == edges[i][1])
       return 1;
-  }
+  } //return 0;
 
   return 0;
 }
 
-int checkExi(char *nm, int edges[no_edges][2], int size, int V[3]) {
-
+int checkExi(char *nm, int edges[no_edges][2], int size, int V[3], fst, snd) {
+  switch(*(nm+1)) {
+    case 'x':
+      return eval(substr(g, 2, strlen(g) - 1), edges, size, V, snd, 1);
+    case 'y':
+      return eval(substr(g, 2, strlen(g) - 1), edges, size, V, snd, 2);
+    case 'z':
+      return eval(substr(g, 2, strlen(g) - 1), edges, size, V, snd, 3);
+    default: break;
+  }
 }
 
-int checkUni(char *nm, int edges[no_edges][2], int size, int V[3]) {
-
+int checkUni(char *nm, int edges[no_edges][2], int size, int V[3], fst, snd) {
+  switch(*(nm+1)) {
+    case 'x':
+      return eval(substr(g, 2, strlen(g) - 1), edges, size, V, snd, 4);
+    case 'y':
+      return eval(substr(g, 2, strlen(g) - 1), edges, size, V, snd, 5);
+    case 'z':
+      return eval(substr(g, 2, strlen(g) - 1), edges, size, V, snd, 6);
+    default: break;
+  }
 }
 
-int checkBin(char *nm, int edges[no_edges][2], int size, int V[3]) {
+int checkBin(char *nm, int edges[no_edges][2], int size, int V[3], fst ,snd) {
   int binPos = findBin(nm);
-  int lFmla = eval(substr(nm, 1, binPos-1), edges, size, V);
-  int rFmla = eval(substr(nm, binPos+1, strlen(nm)-2), edges, size, V);
+  int lFmla = eval(substr(nm, 1, binPos-1), edges, size, V, fst, snd);
+  int rFmla = eval(substr(nm, binPos+1, strlen(nm)-2), edges, size, V, fst, snd);
   if (*(nm + binPos) == 'v' && (lFmla && rFmla))
     return 1;
   if (*(nm + binPos) == '^' && (lFmla || rFmla))
@@ -130,13 +225,13 @@ int checkBin(char *nm, int edges[no_edges][2], int size, int V[3]) {
 }
 
 //this method takes a formula, the list of edges of a graph, the number of vertices and a variable assignment. It then evaluates the formula and returns 1 or 0 as appropriate.
-int eval(char *nm, int edges[no_edges][2], int size, int V[3]) {
+int eval(char *nm, int edges[no_edges][2], int size, int V[3], int fst, int snd) { //added pararam fst and snd to eval change below
 	switch(parse(nm)) {
-    case 1: return checkAtom(nm, edges, V);
-    case 2: return !eval(substr(nm, 1, strlen(nm) - 1), edges, size, V);
-    case 3: return checkBin(nm, edges, size, V);
-    case 4: return checkExi(nm, edges, size, V);
-    case 5: return checkUni(nm, edges, size, V);
+    case 1: return checkAtom(nm, edges, V, fst, snd);
+    case 2: return !eval(substr(nm, 1, strlen(nm) - 1), edges, size, V, fst, snd);
+    case 3: return checkBin(nm, edges, size, V, fst, snd);
+    case 4: return checkExi(nm, edges, size, V, fst, snd);
+    case 5: return checkUni(nm, edges, size, V, fst, snd);
     default: return 0; break;
 	}
 }
@@ -186,7 +281,7 @@ int main()
   printf("z is ?");scanf(" %d", &V[2]);
 
   /*Now check if formula is true in the graph with given variable assignment. */
-  if (eval(name, edges, no_nodes, V)==1)
+  if (eval(name, edges, no_nodes, V, 0, 0)==1)
     printf("The formula %s is true", name);
   else
     printf("The formula %s is false", name);
