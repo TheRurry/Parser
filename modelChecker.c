@@ -108,7 +108,47 @@ int checkAtom(char *nm, int edges[no_edges][2], int V[3], char *fst, char *snd) 
   // if (fst == "nn" && *snd == 'E' && *(snd + 1) == two) //Evar2
   // if (*fst == 'E' && (*(fst + 1) == one || *(fst + 1) == two)  && *snd == 'E' && (*(snd + 1) == one || *(snd + 1) == two)) //EvarEvar
   // if (*fst == 'E' && *(fst + 1) == two && *snd == 'E' && *(snd + 1) == two) //Evar2Evar2
-  
+
+  if (snd == "nn" || ((fst == "nn" || *fst == "E") && *snd == "E") {
+    for (j = 0; j < size; j++) {
+      for (i = 0; i < no_edges; i++) {
+        if (var1 == edges[i][0] && var2 == edges[i][1])
+          return 1;
+      }
+    }
+    return 0;
+  }
+
+
+  // //Evar1[var1var2]
+  // for (j = 0; j < size; j++) {
+  //   for (i = 0; i < no_edges; i++) {
+  //     if (j == edges[i][0] && var2 == edges[i][1])
+  //       return 1;
+  //   }
+  // } //return 0;
+  //
+  // //Evar2[var1var2]
+  // for (j = 0; j < size; j++) {
+  //   for (i = 0; i < no_edges; i++) {
+  //     if (var1 == edges[i][0] && j == edges[i][1])
+  //       return 1;
+  //   }
+  // } //return 0;
+  //
+  // //Evar1Evar2[var1var2]
+  // for (j = 0; j < size; j++) {
+  //   for (i = 0; i < no_edges; i++) {
+  //     if (j == edges[i][0] && j == edges[i][1])
+  //       return 1;
+  //   }
+  // } //return 0;
+  //
+  // //no quantifiers
+  // for (i = 0; i < no_edges; i++) {
+  //   if (var1 == edges[i][0] && var2 == edges[i][1])
+  //     return 1;
+  // } //return 0;
 
   //second for loop
   // if (fst == "nn" && *snd == 'A' && *(snd + 1) == one) //Avar1
