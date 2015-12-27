@@ -163,34 +163,23 @@ int checkAtom(char *nm, int edges[no_edges][2], int V[3], char *fst, char *snd) 
 
   //existential then universal
   if (*fst == 'E' && *snd == 'A' && *(fst + 1) != *(snd + 1)) {
-
+    for (k = 0; k < size; k++) {
+      int temp = 1;
+      for (j = 0; j < size; j++) {
+        if (*(fst + 1) == two) {
+          int swap = k;
+          j = k;
+          k = swap;
+        }
+        for (i = 0; i < no_edges; i++) {
+          temp = temp && (k == edges[i][0] && j == edges[i][1]);
+        }
+      }
+      if (temp)
+        return 1;
+    }
+    return 0;
   }
-  // //Avar1Evar2[var1var2]
-  // for (k = 0; k < size; k++) {
-  //   int temp = 0;
-  //   for (j = 0; j < size; j++) {
-  //     for (i = 0; i < no_edges; i++) {
-  //       if (!temp)
-  //         temp = temp || (k == edges[i][0] && j == edges[i][1]);
-  //     }
-  //   }
-  //   if (!temp)
-  //     return 0;
-  // } //return 1;
-  //
-  // //forgot to add Evar2Avar1 && Avar2Evar1 maybe add when condensing
-  //
-  // //Evar1Avar2[var1var2]
-  // for (k = 0; k < size; k++) {
-  //   int temp = 1;
-  //   for (j = 0; j < size; j++) {
-  //     for (i = 0; i < no_edges; i++) {
-  //       temp = temp && (k == edges[i][0] && j == edges[i][1]);
-  //     }
-  //   }
-  //   if (temp)
-  //     return 1;
-  // } //return 0;
 
   return 0;
 }
