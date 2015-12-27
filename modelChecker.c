@@ -92,7 +92,7 @@ int checkAtom(char *nm, int edges[no_edges][2], int V[3], char *fst, char *snd) 
   int i, j, var1 = 0, var2 = 0, check1 = 0, check2 = 0;
   char one, two; //stores character of var1 and var2
 
-  //variable assignments
+  //variable assignments for no quantifiers
   for (i = 0; i < 3; i++) {
     if (*(nm+2) == 'x' + i)
       var1 = V[i];
@@ -102,15 +102,17 @@ int checkAtom(char *nm, int edges[no_edges][2], int V[3], char *fst, char *snd) 
       two = 'x' + i
   }
 
-  //first for loop
-  // if (fst == "nn" && snd = "nn") //no quantifiers
-  // if (fst == "nn" && *snd == 'E' && *(snd + 1) == one) //Evar1
-  // if (fst == "nn" && *snd == 'E' && *(snd + 1) == two) //Evar2
-  // if (*fst == 'E' && (*(fst + 1) == one || *(fst + 1) == two)  && *snd == 'E' && (*(snd + 1) == one || *(snd + 1) == two)) //EvarEvar
-  // if (*fst == 'E' && *(fst + 1) == two && *snd == 'E' && *(snd + 1) == two) //Evar2Evar2
-
-  if (snd == "nn" || ((fst == "nn" || *fst == "E") && *snd == "E") {
+  //just existential or no quantifiers
+  if (snd == "nn" || ((fst == "nn" || *fst == "E") && *snd == "E")) {
     for (j = 0; j < size; j++) {
+      if (*(fst + 1) == one)
+        var1 = j;
+      if (*(fst + 1) == two)
+        var2 = j;
+      if (*(snd + 1) == one)
+        var1 = j;
+      if (*(snd + 1) == two)
+        var2 = j;
       for (i = 0; i < no_edges; i++) {
         if (var1 == edges[i][0] && var2 == edges[i][1])
           return 1;
@@ -119,46 +121,50 @@ int checkAtom(char *nm, int edges[no_edges][2], int V[3], char *fst, char *snd) 
     return 0;
   }
 
+  //just universal
+  if ((fst == "nn" || *fst == "A") && *snd == "A") {
+    for (j = 0; j < size; j++) {
+      if (*(fst + 1) == one)
+        var1 = j;
+      if (*(fst + 1) == two)
+        var2 = j;
+      if (*(snd + 1) == one)
+        var1 = j;
+      if (*(snd + 1) == two)
+        var2 = j;
+      for (i = 0; i < no_edges; i++) {
+        if (!(var1 == edges[i][0] && var2 == edges[i][1]))
+          return 0;
+      }
+    }
+    return 1;
+  }
 
-  // //Evar1[var1var2]
-  // for (j = 0; j < size; j++) {
-  //   for (i = 0; i < no_edges; i++) {
-  //     if (j == edges[i][0] && var2 == edges[i][1])
-  //       return 1;
-  //   }
-  // } //return 0;
-  //
-  // //Evar2[var1var2]
-  // for (j = 0; j < size; j++) {
-  //   for (i = 0; i < no_edges; i++) {
-  //     if (var1 == edges[i][0] && j == edges[i][1])
-  //       return 1;
-  //   }
-  // } //return 0;
-  //
-  // //Evar1Evar2[var1var2]
-  // for (j = 0; j < size; j++) {
-  //   for (i = 0; i < no_edges; i++) {
-  //     if (j == edges[i][0] && j == edges[i][1])
-  //       return 1;
-  //   }
-  // } //return 0;
-  //
-  // //no quantifiers
-  // for (i = 0; i < no_edges; i++) {
-  //   if (var1 == edges[i][0] && var2 == edges[i][1])
-  //     return 1;
-  // } //return 0;
+  //universal then existential
+  if (*fst == 'A' && *snd == 'E' && *(fst + 1) != *(snd + 1)) {
+    for (k = 0; k < size; k++) {
+      int temp = 0;
+      for (j = 0; j < size; j++) {
+        if (*(fst + 1) == two) {
+          int swap = k;
+          j = k;
+          k = swap;
+        }
+        for (i = 0; i < no_edges; i++) {
+          if (!temp)
+            temp = temp || (k == edges[i][0] && j == edges[i][1]);
+        }
+      }
+      if (!temp)
+        return 0;
+    }
+    return 1;
+  }
 
-  //second for loop
-  // if (fst == "nn" && *snd == 'A' && *(snd + 1) == one) //Avar1
-  //finish this if list, then use this to condense for loops
+  //existential then universal
+  if (*fst == 'E' && *snd == 'A' && *(fst + 1) != *(snd + 1)) {
 
-  //third for loop
-
-  //fourth for loop
-
-  // //below code needs serious condensing and tidying
+  }
   // //Avar1Evar2[var1var2]
   // for (k = 0; k < size; k++) {
   //   int temp = 0;
@@ -183,60 +189,6 @@ int checkAtom(char *nm, int edges[no_edges][2], int V[3], char *fst, char *snd) 
   //     }
   //   }
   //   if (temp)
-  //     return 1;
-  // } //return 0;
-  //
-  // //Avar1[var1var2]
-  // for (j = 0; j < size; j++) {
-  //   for (i = 0; i < no_edges; i++) {
-  //     if (!(j == edges[i][0] && var2 == edges[i][1]))
-  //       return 0;
-  //   }
-  // } //return 1;
-  //
-  // //Avar2[var1var2]
-  // for (j = 0; j < size; j++) {
-  //   for (i = 0; i < no_edges; i++) {
-  //     if (!(var1 == edges[i][0] && j == edges[i][1]))
-  //       return 0;
-  //   }
-  // } //return 1;
-  //
-  // //Avar1Avar2[var1var2]
-  // for (j = 0; j < size; j++) {
-  //   for (i = 0; i < no_edges; i++) {
-  //     if (!(j == edges[i][0] && j == edges[i][1]))
-  //       return 0;
-  //   }
-  // } //return 1;
-  //
-  // //Evar1[var1var2]
-  // for (j = 0; j < size; j++) {
-  //   for (i = 0; i < no_edges; i++) {
-  //     if (j == edges[i][0] && var2 == edges[i][1])
-  //       return 1;
-  //   }
-  // } //return 0;
-  //
-  // //Evar2[var1var2]
-  // for (j = 0; j < size; j++) {
-  //   for (i = 0; i < no_edges; i++) {
-  //     if (var1 == edges[i][0] && j == edges[i][1])
-  //       return 1;
-  //   }
-  // } //return 0;
-  //
-  // //Evar1Evar2[var1var2]
-  // for (j = 0; j < size; j++) {
-  //   for (i = 0; i < no_edges; i++) {
-  //     if (j == edges[i][0] && j == edges[i][1])
-  //       return 1;
-  //   }
-  // } //return 0;
-  //
-  // //no quantifiers
-  // for (i = 0; i < no_edges; i++) {
-  //   if (var1 == edges[i][0] && var2 == edges[i][1])
   //     return 1;
   // } //return 0;
 
