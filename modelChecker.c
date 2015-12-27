@@ -120,7 +120,7 @@ int checkAtom(char *nm, int edges[no_edges][2], int size, int V[3], char *fst, c
         var1 = i;
       if (*(snd + 1) == two)
         var2 = i;
-      if (!(var1 == edges[i][0] && var2 == edges[i][1]) )
+      if (!(var1 == edges[i][0] && var2 == edges[i][1]))
         return 0;
     }
     return 1;
@@ -146,7 +146,6 @@ int checkAtom(char *nm, int edges[no_edges][2], int size, int V[3], char *fst, c
 
   //existential then universal
   if (*fst == 'E' && *snd == 'A' && *(fst + 1) != *(snd + 1)) {
-    int check;
     for (k = 0; k < size; k++) {
       int temp = 1;
       for (j = 0; j < size; j++) {
@@ -193,9 +192,9 @@ int checkBin(char *nm, int edges[no_edges][2], int size, int V[3], char *fst , c
   int binPos = findBin(nm);
   int lFmla = eval(substr(nm, 1, binPos-1), edges, size, V, fst, snd);
   int rFmla = eval(substr(nm, binPos+1, strlen(nm)-2), edges, size, V, fst, snd);
-  if (*(nm + binPos) == 'v' && (lFmla && rFmla))
+  if (*(nm + binPos) == '^' && (lFmla && rFmla))
     return 1;
-  if (*(nm + binPos) == '^' && (lFmla || rFmla))
+  if (*(nm + binPos) == 'v' && (lFmla || rFmla))
     return 1;
   if (*(nm + binPos) == '>' && !(lFmla && !rFmla))
     return 1;
