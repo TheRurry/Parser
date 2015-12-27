@@ -88,54 +88,40 @@ int parse(char *g) {
 int eval();
 
 //Checks to see if an atomic fmla will evaluate true
-int checkAtom(char *nm, int edges[no_edges][2], int V[3], char *fst, char *snd) {
-  int i, j, var1 = 0, var2 = 0, check1 = 0, check2 = 0;
-  char one, two; //stores character of var1 and var2
+int checkAtom(char *nm, int edges[no_edges][2], int size, int V[3], char *fst, char *snd) {
+  int i, j, k, var1 = 0, var2 = 0;
+  char one = *(nm + 2), two = *(nm + 3); //stores character of var1 and var2
 
   //variable assignments for no quantifiers
   for (i = 0; i < 3; i++) {
     if (*(nm+2) == 'x' + i)
       var1 = V[i];
-      one = 'x' + i;
     if (*(nm+3) == 'x' + i)
       var2 = V[i];
-      two = 'x' + i
   }
 
-  //just existential or no quantifiers
-  if (snd == "nn" || ((fst == "nn" || *fst == "E") && *snd == "E")) {
-    for (j = 0; j < size; j++) {
-      if (*(fst + 1) == one)
-        var1 = j;
-      if (*(fst + 1) == two)
-        var2 = j;
+  //just one existential or no quantifiers
+  if (*snd == 'n' || (*fst == 'n' && *snd == 'E')) {
+    for (i = 0; i < no_edges; i++) {
       if (*(snd + 1) == one)
-        var1 = j;
+        var1 = i;
       if (*(snd + 1) == two)
-        var2 = j;
-      for (i = 0; i < no_edges; i++) {
-        if (var1 == edges[i][0] && var2 == edges[i][1])
-          return 1;
-      }
+        var2 = i;
+      if (var1 == edges[i][0] && var2 == edges[i][1])
+        return 1;
     }
     return 0;
   }
 
-  //just universal
-  if ((fst == "nn" || *fst == "A") && *snd == "A") {
-    for (j = 0; j < size; j++) {
-      if (*(fst + 1) == one)
-        var1 = j;
-      if (*(fst + 1) == two)
-        var2 = j;
+  //just one universal
+  if ((*fst == 'n' || *fst == 'A') && *snd == 'A') {
+    for (i = 0; i < no_edges; i++) {
       if (*(snd + 1) == one)
-        var1 = j;
+        var1 = i;
       if (*(snd + 1) == two)
-        var2 = j;
-      for (i = 0; i < no_edges; i++) {
-        if (!(var1 == edges[i][0] && var2 == edges[i][1]))
-          return 0;
-      }
+        var2 = i;
+      if (!(var1 == edges[i][0] && var2 == edges[i][1]) )
+        return 0;
     }
     return 1;
   }
@@ -145,14 +131,11 @@ int checkAtom(char *nm, int edges[no_edges][2], int V[3], char *fst, char *snd) 
     for (k = 0; k < size; k++) {
       int temp = 0;
       for (j = 0; j < size; j++) {
-        if (*(fst + 1) == two) {
-          int swap = k;
-          j = k;
-          k = swap;
-        }
         for (i = 0; i < no_edges; i++) {
-          if (!temp)
+          if (*(fst + 1) == one)
             temp = temp || (k == edges[i][0] && j == edges[i][1]);
+          if (*(fst + 1) == two)
+            temp = temp || (j == edges[i][0] && k == edges[i][1]);
         }
       }
       if (!temp)
@@ -163,16 +146,15 @@ int checkAtom(char *nm, int edges[no_edges][2], int V[3], char *fst, char *snd) 
 
   //existential then universal
   if (*fst == 'E' && *snd == 'A' && *(fst + 1) != *(snd + 1)) {
+    int check;
     for (k = 0; k < size; k++) {
       int temp = 1;
       for (j = 0; j < size; j++) {
-        if (*(fst + 1) == two) {
-          int swap = k;
-          j = k;
-          k = swap;
-        }
         for (i = 0; i < no_edges; i++) {
-          temp = temp && (k == edges[i][0] && j == edges[i][1]);
+          if (*(fst + 1) == one)
+              temp = temp || (k == edges[i][0] && j == edges[i][1]);
+          if (*(fst + 1) == two)
+              temp = temp || (j == edges[i][0] && k == edges[i][1]);
         }
       }
       if (temp)
@@ -180,18 +162,17 @@ int checkAtom(char *nm, int edges[no_edges][2], int V[3], char *fst, char *snd) 
     }
     return 0;
   }
-
   return 0;
 }
 
 int checkExi(char *nm, int edges[no_edges][2], int size, int V[3], char *fst, char *snd) {
   switch(*(nm+1)) {
     case 'x':
-      return eval(substr(g, 2, strlen(g) - 1), edges, size, V, snd, "Ex");
+      return eval(substr(nm, 2, strlen(nm) - 1), edges, size, V, snd, "Ex");
     case 'y':
-      return eval(substr(g, 2, strlen(g) - 1), edges, size, V, snd, "Ey");
+      return eval(substr(nm, 2, strlen(nm) - 1), edges, size, V, snd, "Ey");
     case 'z':
-      return eval(substr(g, 2, strlen(g) - 1), edges, size, V, snd, "Ez");
+      return eval(substr(nm, 2, strlen(nm) - 1), edges, size, V, snd, "Ez");
     default: break;
   }
 }
@@ -199,11 +180,11 @@ int checkExi(char *nm, int edges[no_edges][2], int size, int V[3], char *fst, ch
 int checkUni(char *nm, int edges[no_edges][2], int size, int V[3], char *fst, char *snd) {
   switch(*(nm+1)) {
     case 'x':
-      return eval(substr(g, 2, strlen(g) - 1), edges, size, V, snd, "Ax");
+      return eval(substr(nm, 2, strlen(nm) - 1), edges, size, V, snd, "Ax");
     case 'y':
-      return eval(substr(g, 2, strlen(g) - 1), edges, size, V, snd, "Ay");
+      return eval(substr(nm, 2, strlen(nm) - 1), edges, size, V, snd, "Ay");
     case 'z':
-      return eval(substr(g, 2, strlen(g) - 1), edges, size, V, snd, "Az");
+      return eval(substr(nm, 2, strlen(nm) - 1), edges, size, V, snd, "Az");
     default: break;
   }
 }
@@ -222,9 +203,9 @@ int checkBin(char *nm, int edges[no_edges][2], int size, int V[3], char *fst , c
 }
 
 //this method takes a formula, the list of edges of a graph, the number of vertices and a variable assignment. It then evaluates the formula and returns 1 or 0 as appropriate.
-int eval(char *nm, int edges[no_edges][2], int size, int V[3], char *fst, char *snd) { //added pararam fst and snd to eval change below
+int eval(char *nm, int edges[no_edges][2], int size, int V[3], char *fst, char *snd) {
 	switch(parse(nm)) {
-    case 1: return checkAtom(nm, edges, V, fst, snd);
+    case 1: return checkAtom(nm, edges, size, V, fst, snd);
     case 2: return !eval(substr(nm, 1, strlen(nm) - 1), edges, size, V, fst, snd);
     case 3: return checkBin(nm, edges, size, V, fst, snd);
     case 4: return checkExi(nm, edges, size, V, fst, snd);
