@@ -27,7 +27,7 @@ int binCheck(char g) {
   return g == '^' || g == 'v' || g == '>';
 }
 
-//returns position of binary connective
+//returns position of a binary connective
 int findBin(char *g) {
   int count = 0, pos = 0, i;
   for (i = 0; i < strlen(g); i++) {
@@ -50,7 +50,7 @@ int valid(char *g) {
     case '-': return valid(substr(g, 1, strlen(g) - 1));
     case '(':
       binPos = findBin(g);
-      if (binPos == 0)
+      if (!binPos)
         return 0;
       return valid(substr(g, 1, binPos-1)) && valid(substr(g, binPos+1, strlen(g)-2));
     case 'E':
@@ -142,7 +142,7 @@ int main() {
   if ((fpout=fopen("output.txt","w")) == NULL) {printf("Error opening file"); exit(1);}
 
   int j;
-  for(j = 0; j < cases; j++) {
+  for (j = 0; j < cases; j++) {
     fscanf(fp, "%s %d %d",name,&no_nodes,&no_edges);
     int edges[no_edges][2];
     for(i = 0; i < no_edges; i++)
