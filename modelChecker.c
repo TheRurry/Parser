@@ -7,35 +7,24 @@ const int Fsize = 50;
 int no_edges;
 int no_nodes;
 int i;
-const int cases = 6; //change back to 6
+const int cases = 6;
 
 //returns a substring, of the entered string
 char *substr(char *g, int start, int end) {
-  char* temp = malloc(end-start+2); //+1 for null char
-  strncpy(temp, g+start, end-start+1);
-  temp[end-start+1] = 0;
+  char* temp = malloc(end - start + 2); //+1 for null char
+  strncpy(temp, g + start, end - start + 1);
+  temp[end - start + 1] = 0;
   return temp;
 }
 
 //check if a character is a variable
 int varCheck(char g) {
-  if (g == 'x' || g == 'y' || g == 'z')
-    return 1;
-  return 0;
-}
-
-//check if fmla is a valid atomic formula
-int atom(char *g) {
-  if (strlen(g) == 5 && *(g+1) == '[' && *(g+4) == ']' && varCheck(*(g+2)) && varCheck(*(g+3)))
-    return 1;
-  return 0;
+  return g == 'x' || g == 'y' || g == 'z';
 }
 
 //check if a character is a binary connector
 int binCheck(char g) {
-  if (g == '^' || g == 'v' || g == '>')
-    return 1;
-  return 0;
+  return g == '^' || g == 'v' || g == '>';
 }
 
 //returns position of binary connective
@@ -57,7 +46,7 @@ int findBin(char *g) {
 int valid(char *g) {
   int binPos;
   switch(*g) {
-    case 'X': return atom(g);
+    case 'X': return strlen(g) == 5 && *(g+1) == '[' && *(g+4) == ']' && varCheck(*(g+2)) && varCheck(*(g+3));
     case '-': return valid(substr(g, 1, strlen(g) - 1));
     case '(':
       binPos = findBin(g);
@@ -79,7 +68,7 @@ int valid(char *g) {
 //returns 0 for non-formulas, 1 for atoms, 2 for negations, 3 for binary connective fmlas, 4 for existential and 5 for universal formulas.
 int parse(char *g) {
   switch(*g) {
-    case 'X': return atom(g);
+    case 'X': return valid(g);
     case '-': return valid(g) ? 2 : 0;
     case '(': return valid(g) ? 3 : 0;
     case 'E': return valid(g) ? 4 : 0;
@@ -145,9 +134,8 @@ int eval(char *nm, int edges[no_edges][2], int size, int V[3]) {
 	}
 }
 
-
 int main() {
-  char *name = malloc(Fsize); /*create space for the formula*/
+  char *name = malloc(Fsize);
   FILE *fp, *fpout;
 
   if ((fp=fopen("input.txt","r")) == NULL) {printf("Error opening file"); exit(1);}
