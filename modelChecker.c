@@ -141,7 +141,7 @@ int eval(char *nm, int edges[no_edges][2], int size, int V[3]) {
         evaluation = evaluation && eval(substr(nm, 2, strlen(nm) - 1), edges, size, W);
       }
       return evaluation;
-    default: return 0; break;
+    default: return 0;
 	}
 }
 
